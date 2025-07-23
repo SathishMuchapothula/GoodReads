@@ -1,0 +1,81 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>GoodReads Authors</title>
+</head>
+<body>
+  <h1>Author List</h1>
+  <ul id="authorList"></ul>
+
+  <script>
+    // Make GET request to backend
+    fetch('http://localhost:3000/books/')
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+        const ul = document.getElementById('authorList');
+        data.forEach(author => {
+          const li = document.createElement('li');
+          li.textContent = author.name; // update key based on your DB column
+          ul.appendChild(li);
+        });
+      })
+      .catch(err => console.error('Error fetching authors:', err));
+  </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Author POST Request</title>
+</head>
+<body>
+  <h2>Send Author Data</h2>
+  <form id="authorForm">
+    <label>Name: <input type="text" name="name" required></label><br><br>
+    <label>Birthdate: <input type="text" name="birthdate" required></label><br><br>
+    <label>Birthplace: <input type="text" name="birthplace" required></label><br><br>
+    <label>Book Sales: <input type="number" name="book_sales" required></label><br><br>
+    <label>Genres: <input type="text" name="genres" required></label><br><br>
+    <label>ID: <input type="number" name="id" required></label><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("authorForm");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = {
+        name: formData.get("name"),
+        birthdate: formData.get("birthdate"),
+        birthplace: formData.get("birthplace"),
+        book_sales: parseInt(formData.get("book_sales")),
+        genres: formData.get("genres"),
+        id: parseInt(formData.get("id"))
+      };
+
+      fetch("http://localhost:3000/authors/", {  // Replace with your backend URL
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        alert("Author data sent successfully!");
+        console.log(result);
+      })
+      .catch(error => {
+        alert("Error sending data");
+        console.error(error);
+      });
+    });
+  </script>
+</body>
+</html>
