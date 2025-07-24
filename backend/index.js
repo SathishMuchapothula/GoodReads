@@ -115,3 +115,25 @@ app.post('/authors/', async (req, res) => {
     res.status(500).send({ error: 'Failed to add author' });
   }
 });
+
+app.put('/authors/:authorId', async (req, res) => {
+  try {
+    const { authorId } = req.params;
+    const { newName } = req.body;
+
+    const dbResponse = await db.run(`
+      UPDATE author
+      SET name = ?
+      WHERE id = ?`, [newName, authorId]);
+
+    if (dbResponse.changes === 0) {
+      res.status(404).send("Author not found");
+    } else {
+      res.send(`Author ${authorId} updated successfully`);
+      res.status(201)
+    }
+  } catch (error) {
+    console.error("Error updating author:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});

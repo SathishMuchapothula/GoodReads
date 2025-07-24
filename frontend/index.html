@@ -14,8 +14,41 @@
     <label>Biography: <input type="text" id="biography" required></label><br><br>
     <button type="submit">Submit</button>
   </form>
+  
+  <form id="sendPutRequest">
+    <label>Author ID (to update): <input type="number" id="author_id" required></label><br><br>
+    <label>Name (to update): <input type="text" id="newName" required></label><br><br>
+    <button type="submit">Submit</button>
+  </form>
 
   <script>
+
+    const sendPutRequest = document.getElementById('sendPutRequest')
+    sendPutRequest.addEventListener('submit' ,function(e) {
+      e.preventDefault()
+
+      let authorId = parseInt(document.getElementById('author_id').value)
+      let newData = {
+        newName: document.getElementById('newName').value
+      }
+
+      fetch(`http://localhost:3000/authors/${authorId}`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newData)
+      })
+      .then(response => response.text())
+      .then(result => {
+        alert("Data updated Successfully");
+      })
+      .catch(error => {
+        alert('Error  updating data')
+      })
+    })
+
+
     const form = document.getElementById("authorForm");
 
     form.addEventListener("submit", function(e) {
@@ -35,15 +68,6 @@
         genres,
         biography
       }
-      // const formData = new FormData(form);
-      // const data = {
-      //   name: formData.get("name"),
-      //   birthdate: formData.get("birthdate"),
-      //   birthplace: formData.get("birthplace"),
-      //   book_sales: parseInt(formData.get("book_sales")),
-      //   genres: formData.get("genres"),
-      //   biography: formData.get("biography")
-      // };
 
       fetch("http://localhost:3000/authors/", {  // Replace with your backend URL
         method: "POST",
@@ -62,6 +86,9 @@
         console.error(error);
       });
     });
+
+
+
   </script>
 </body>
 </html>
