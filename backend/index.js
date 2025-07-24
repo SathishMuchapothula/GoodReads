@@ -1,42 +1,3 @@
-// const express = require('express')
-// const path = require('path')
-// const app = express()
-
-// const {open} = require('sqlite')
-// const sqlite3 = require('sqlite3')
-
-// const dbpath = path.join(__dirname, 'goodreads.db')
-
-// let db = null
-// const initializeDBAndServer = async () => {
-//   try {
-//     db = await open({
-//       filename: dbpath,
-//       driver: sqlite3.Database,
-//     })
-//     app.listen(3000)
-//   } catch (e) {
-//     console.log(`${e.message}`)
-//     process.exit(1)
-//   }
-// }
-
-// initializeDBAndServer()
-
-
-// app.get('/books/', async (request, response) => {
-//   const getBooksQuery = `
-//   select *
-//   from book
-//   order by book_id;`
-//   const booksArray = await db.all(getBooksQuery)
-//   response.send(booksArray)
-// })
-
-
-
-
-
 // to set up database from the js file itself
 
 /*const express = require('express');
@@ -86,34 +47,7 @@ const initializeDBAndServer = async () => {
       process.exit(1);
   }
 }
-initializeDBAndServer();
-
-
-app.get('/', async (request, response) => {
-  const getBooksQuery = `
-  select *
-  from author`
-  const booksArray = await db.all(getBooksQuery)
-  response.send(booksArray)
-})
-
-app.get('/author/', async (request, response) => {
-  const getBooksQuery = `
-  select *
-  from author`
-  const booksArray = await db.all(getBooksQuery)
-  response.send(booksArray)
-})
-
-// To get the details of the author with ID 1, visit:
-// http://localhost:3000/author/1
-app.get('/author/:id', async (request, response) => {
-  const { id } = request.params;
-  const getAuthorQuery = `SELECT * FROM author WHERE id = ${id}`;
-  const author = await db.get(getAuthorQuery);
-  response.send(author);
-});*/
-
+initializeDBAndServer();*/
 
 
 const express = require("express");
@@ -124,7 +58,7 @@ const sqlite3 = require("sqlite3");
 const app = express();
 
 const dbPath = path.join(__dirname, "goodreads.db");
-app.use(express.json());
+app.use(express.json()); // MUST be added to parse JSON body
 const cors = require('cors');
 app.use(cors());
 
@@ -158,7 +92,7 @@ app.get("/authors/", async (request, response) => {
   response.send(booksArray);
 });
 
-
+//visit   http://localhost:3000/author/1
 //db.get used to get single book from the table
 app.get("/authors/:authorId/", async(req, res) => {
   const {authorId} = req.params
@@ -166,54 +100,18 @@ app.get("/authors/:authorId/", async(req, res) => {
 })
 
 
-//run is used to create or update the data
-// app.post('/authors/', async(req, res) => {
-//   const authorDetails = req.body
-//   console.log(authorDetails)
-//   const {name,birthplace,birthdate,genres,book_sales,biography} = authorDetails
-//   const addAuthorsQuery = `
-//     INSERT INTO 
-//       author (name,birthplace,birthdate,genres,book_sales,biography)
-//     VALUES
-//       (
-//         '${name}',
-//         '${birthplace}',
-//         '${birthdate}',
-//         '${genres}',
-//         '${book_sales}',
-//         '${biography}',
-//       )
-//     `
-//   const dbResponse = await db.run(addAuthorsQuery)
-//   console.log(dbResponse)
-//   res.send(dbResponse)
-// })
-app.use(express.json()); // MUST be added to parse JSON body
-
+// db.run is used to create or update the data
 app.post('/authors/', async (req, res) => {
-  const authorDetails = req.body;
-  console.log("Received:", authorDetails);
-
-  const { name, birthplace, birthdate, genres, book_sales, biography } = authorDetails;
-
-  const addAuthorsQuery = `
-    INSERT INTO author (name, birthplace, birthdate, genres, book_sales, biography)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `;
-
   try {
-    const dbResponse = await db.run(addAuthorsQuery, [
-      name,
-      birthplace,
-      birthdate,
-      genres,
-      book_sales,
-      biography
-    ]);
-    console.log("DB Response:", dbResponse);
-    res.send({ message: "Author added successfully", id: dbResponse.lastID });
+    const { name, birthplace, birthdate, genres, book_sales, biography } = req.body;
+    const addAuthorsQuery = `
+      INSERT INTO author (name, birthplace, birthdate, genres, book_sales, biography)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const dbResponse = await db.run(addAuthorsQuery, [name, birthplace, birthdate, genres, book_sales, biography]);
+    res.send({ authorId: dbResponse.lastID });
   } catch (error) {
-    console.error("DB Error:", error.message);
-    res.status(500).send({ error: "Failed to add author" });
+    console.error('Error inserting author:', error);
+    res.status(500).send({ error: 'Failed to add author' });
   }
 });
